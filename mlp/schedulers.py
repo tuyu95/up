@@ -7,6 +7,7 @@ training run.
 """
 
 import numpy as np
+import math
 
 
 class ConstantLearningRateScheduler(object):
@@ -65,7 +66,25 @@ class CosineAnnealingWithWarmRestarts(object):
                 attributes of this object.
             epoch_number: Integer index of training epoch about to be run.
         """
-        raise NotImplementedError
+        #for max_learning_rate, min_learning_rate, total_epochs_per_period, learning_rate, epoch in (self.max_learning_rate, self.min_learning_rate,
+        #   self.total_epochs_per_period, learning_rule, epoch_number):
+
+        #    learning_rule.learning_rate = self.min_learning_rate + 0.5 * (self.max_learning_rate - self.min_learning_rate) 
+        #                                    * (1 + np.cos(np.pi * epoch / self.total_epochs_per_period))
+        time = 0
+        sumep = 0
+        while True:
+            sumep += self.total_epochs_per_period * self.period_iteration_expansion_factor ** time
+            if sumep > epoch_number:
+                break
+            time += 1
+        
+        learning_rule.learning_rate = self.min_learning_rate + 0.5 * (self.max_learning_rate * self.max_learning_rate_discount_factor ** time - self.min_learning_rate) * (1 + np.cos(np.pi * (self.total_epochs_per_period * self.period_iteration_expansion_factor ** time - (sumep - epoch_number)) / (self.total_epochs_per_period * self.period_iteration_expansion_factor ** time)))
+           
+        learning_rate = learning_rule.learning_rate
+        return learning_rate
+
+        #raise NotImplementedError
 
 
 
